@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ExtractText Demo</title>
+  <style>
+    body{
+      font-family: sans-serif;
+      max-width: 720px;
+      margin:40px auto;
+      background:#121212;
+      color:#e0e0e0;
+    }
+    h1{ text-align:center; color:#fff; }
+    #dropzone{
+      border:3px dashed #666;
+      border-radius:8px;
+      padding:40px;
+      text-align:center;
+      color:#aaa;
+      transition:background .2s ease-in-out;
+    }
+    #dropzone.dragover{background:#263238;color:#fff;}
+    #metadata{margin-top:25px;}
+    #result{
+      margin-top:25px;
+      height:300px;
+      border:1px solid #444;
+      border-radius:4px;
+      padding:10px;
+      overflow:auto;
+      white-space:pre-wrap;
+      background:#1e1e1e;
+      font-family: monospace;
+      font-size:13px;
+      color:#e0e0e0;
+    }
+    details{cursor:pointer;}
+    .row{margin:4px 0;}
+    label{font-weight:bold;color:#fff;}
+  </style>
+</head>
+<body>
+  <h1>ExtractText Live Demo</h1>
+
+  <!-- Upload / Drag-and-Drop area -->
+  <div id="dropzone">
+    <p>Drag &amp; drop a file here or <label for="fileInput" style="color:#0066cc;cursor:pointer;text-decoration:underline;">browse</label>.</p>
+    <input id="fileInput" type="file" style="display:none">
+  </div>
+
+  <!-- Metadata section -->
+  <section id="metadata" hidden>
+    <h2>File metadata</h2>
+    <div class="row"><label>Filename:</label> <span id="metaName"></span></div>
+    <div class="row"><label>Type (MIME):</label> <span id="metaType"></span></div>
+    <div class="row"><label>Size:</label> <span id="metaSize"></span></div>
+    <div class="row"><label>Expected extractor:</label> <span id="metaExtractor"></span></div>
+  </section>
+
+  <!-- JSON result -->
+  <section id="resultSection" hidden>
+    <h2>Extraction result</h2>
+    <div id="result">Waiting for extraction …</div>
+  </section>
+
+  <!-- Stats section -->
+  <section id="statsSection" hidden>
+    <h2>Extraction details</h2>
+    <div class="row"><label>Actual extractor:</label> <span id="statExtractor"></span></div>
+    <div class="row"><label>Elapsed time:</label> <span id="statTime"></span></div>
+    <div class="row"><label>Characters:</label> <span id="statChars"></span></div>
+  </section>
+
+  <script>
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+    const metadataSection = document.getElementById('metadata');
+    const resultSection   = document.getElementById('resultSection');
+    const statsSection    = document.getElementById('statsSection');
+    const metaName = document.getElementById('metaName');
+    const metaType = document.getElementById('metaType');
+    const metaSize = document.getElementById('metaSize');
+    const metaExtractor = document.getElementById('metaExtractor');
+    const resultBox = document.getElementById('result');
+    const statExtractor = document.getElementById('statExtractor');
+    const statTime = document.getElementById('statTime');
+    const statChars = document.getElementById('statChars');
+
+    const EXT_MAP = {
+      'pdf':  ['PDF_TEXT','PDF_IMAGE'],
+      'jpg':  ['IMAGE'],
+      'jpeg': ['IMAGE'],
+      'png':  ['IMAGE'],
+      'csv':  ['CSV'],
+      'docx': ['DOCX'],
+      'txt':  ['TEXT']
+    };
+
+    function guessExtractor(filename){
+      const ext = filename.split('.').pop().toLowerCase();
+      return EXT_MAP[ext]?.join(' / ') || 'Unknown';
+    }
+
+    function humanFileSize(size){
+      const i = size==0?0:Math.floor(Math.log(size)/Math.log(1024));
+      return (size/Math.pow(1024,i)).toFixed(2)+' '+'BKMGTPEZY'[i]+'B';
+    }
+
+    function showMeta(file){
+      metaName.textContent = file.name;
+      metaType.textContent = file.type || '—';
+      metaSize.textContent = humanFileSize(file.size);
+      metaExtractor.textContent = guessExtractor(file.name);
+      metadataSection.hidden = false;
+    }
+
+    function handleFile(file){
+      showMeta(file);
+      resultSection.hidden = false;
+      resultBox.textContent = 'Uploading & extracting…';
+
+      const formData = new FormData();
+      formData.append('file', file, file.name);
+
+      fetch('/extract', {
+        method: 'POST',
+        body: formData
+      })
+      .then(r => {
+        if(!r.ok) throw new Error('Server error');
+        return r.json();
+      })
+      .then(json => {
+        resultBox.textContent = JSON.stringify(json, null, 2);
+
+        // Populate stats section
+        statExtractor.textContent = json.document_type;
+        statTime.textContent = (json.elapsed_ms/1000).toFixed(2) + ' s';
+        statChars.textContent = json.char_count.toLocaleString();
+        statsSection.hidden = false;
+      })
+      .catch(err => {
+        resultBox.textContent = err.message;
+      });
+    }
+
+    // Drag events
+    ;['dragenter','dragover'].forEach(evt => {
+      dropzone.addEventListener(evt, e=>{e.preventDefault();dropzone.classList.add('dragover');});
+    });
+    ;['dragleave','drop'].forEach(evt => {
+      dropzone.addEventListener(evt, e=>{e.preventDefault();dropzone.classList.remove('dragover');});
+    });
+    dropzone.addEventListener('drop', e=>{
+      const file = e.dataTransfer.files[0];
+      if(file) handleFile(file);
+    });
+
+    // File picker fallback
+    dropzone.addEventListener('click', ()=>fileInput.click());
+    fileInput.addEventListener('change', ()=>{
+      const file = fileInput.files[0];
+      if(file) handleFile(file);
+    });
+  </script>
+</body>
+</html> 
