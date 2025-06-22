@@ -1,0 +1,11 @@
+# Core document text extraction dependencies
+pdfminer.six>=20221105
+pdf2image>=1.16.2
+pytesseract>=0.3.10
+python-docx>=0.8.11
+Pillow>=10.0.0
+python-magic>=0.4.27
+chardet>=5.2.0
+
+# Optional quality-of-life utilities
+tqdm>=4.65.0 

@@ -1,0 +1,102 @@
+# ---- Python bytecode & caches ----
+__pycache__/
+*.py[cod]
+*$py.class
+
+# ---- C extensions ----
+*.so
+
+# ---- Distribution / packaging ----
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+egss/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# ---- Virtual environments ----
+.env
+.env*/
+.venv
+.venv*/
+venv/
+venv*/
+ENV/
+env/
+env*/
+
+# ---- Dependency & wheel metadata ----
+*.whl
+pip-wheel-metadata/
+
+# ---- PyInstaller ----
+*.manifest
+*.spec
+
+# ---- Unit test / coverage ----
+.coverage
+*.cover
+coverage.*
+htmlcov/
+
+# pytest
+.pytest_cache/
+
+# tox
+.tox/
+
+# hypothesis
+.hypothesis/
+
+# ---- Type checker ----
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# ---- Linting ----
+ruff_cache/
+
+# ---- Logs & local runtime files ----
+*.log
+*.log.*
+
+# ---- Project documentation (exclude entire folder) ----
+docs/
+
+# ---- Sphinx documentation builds (when docs tracked externally) ----
+docs/_build/
+docs/.doctrees/
+docs/.buildinfo
+
+# ---- Jupyter Notebook checkpoints ----
+.ipynb_checkpoints/
+
+# ---- IDE / Editor configs ----
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# ---- macOS / Windows clutter ----
+.DS_Store
+Thumbs.db
+
+# ---- Temporary files ----
+*.swp
+*~
+
+# ---- Secrets / local overrides ----
+.env.local
+.env.*.local
+
+# ---- Local sample files ----
+samples/ 
