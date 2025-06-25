@@ -27,13 +27,14 @@ RUN apt-get update -qq \
 COPY requirements.txt pyproject.toml README.md ./
 
 RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir -r requirements.txt \
-    && pip install --no-cache-dir --editable .
+    && pip install --no-cache-dir -r requirements.txt
 
 # ---------------------------------------------------------------------------
-# Copy the rest of the source code
+# Copy the rest of the source code and install the package itself
 # ---------------------------------------------------------------------------
 COPY . .
+
+RUN pip install --no-cache-dir --editable .
 
 # Expose the FastAPI port
 EXPOSE 6060
