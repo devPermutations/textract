@@ -1,0 +1,29 @@
+# Exclude files and directories that are unnecessary for running the server
+
+# Version control
+.git
+*.swp
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# Test suites and samples
+extracttext/test/
+
+# Local envs & caches
+.env*
+.venv*
+*.egg-info/
+dist/
+build/
+
+# IDE / editor configs
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Documentation
+docs/ 
