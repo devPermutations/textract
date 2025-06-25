@@ -106,4 +106,44 @@ See [`docs/EXAMPLES.md`](docs/EXAMPLES.md#fastapi-upload-example) for a fully-wo
 Pull requests are welcome! Please run `ruff`, `mypy` and `pytest -q` before submitting.
 
 ## License
-MIT 
+MIT
+
+## Docker container
+
+ExtractText ships with a ready-to-use `Dockerfile` that packages the library together with its OCR dependencies (Tesseract + Poppler) and exposes a lightweight FastAPI service on **port 6060**.
+
+### Build the image
+```bash
+# from repository root
+docker build -t extracttext-api .
+```
+
+### Run the API server
+```bash
+docker run -d --name extracttext -p 6060:6060 extracttext-api
+# → http://localhost:6060/gettext is now live
+```
+
+### Quick end-to-end test (sample scanned PDF)
+With the container running on the **same machine** as the source code, execute:
+```bash
+curl -X POST \
+     -F "file=@extracttext/test/testsamples/pdf-notext.pdf" \
+     http://localhost:6060/gettext | jq
+```
+The response will resemble:
+```jsonc
+{
+  "document_id": "... uuid ...",
+  "document_name": "pdf-notext.pdf",
+  "document_type": "PDF_IMAGE",
+  "text_payload": "Lorem ipsum …",
+  "elapsed_ms": 275.42,
+  "char_count": 1987
+}
+```
+If the server runs on a **remote VPS**, just swap `localhost` for the public IP or DNS (`http://<vps-ip>:6060/gettext`).
+
+> **Tip:** view runtime logs in another terminal with `docker logs -f extracttext`.
+
+--- 
